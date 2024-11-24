@@ -1,0 +1,58 @@
+/* Abstract Container Styling */
+.abstract-container {
+    margin: 20px;
+    padding: 15px;
+    border: 1px solid #B0C4DE; /* Light blue border */
+    border-radius: 10px; /* Rounded corners */
+    background-color: #f9f9f9; /* Light gray background */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow */
+	position: absolute;
+    left: 1600px;
+    top: 800px;
+	z-index: 1000;
+}
+
+/* Heading Styling */
+.abstract-heading {
+    font-size: 18px;
+    color: #333; /* Darker text */
+    margin-bottom: 10px;
+    font-family: "Helvetica Neue", Arial, sans-serif; /* Modern font */
+}
+
+/* Textbox Styling */
+.abstract-textbox {
+    display: block;
+    width: 250px;
+    height: 150px; /* Fixed height */
+    padding: 10px;
+    font-size: 14px;
+    color: #333; /* Text color */
+    border: 1px solid #ccc; /* Subtle border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #ffffff; /* White background */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Inner shadow */
+    resize: none; /* Disable resizing */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transitions */
+}
+
+/* Textbox Focus Effect */
+.abstract-textbox:focus {
+    outline: none;
+    border-color: #5FA8D3; /* Light blue border on focus */
+    box-shadow: 0 0 5px rgba(95, 168, 211, 0.5); /* Subtle glow */
+}
+
+
+/* Hyperlink Styling */
+.abstract-link {
+    color: #5FA8D3; /* Light blue */
+    text-decoration: none; /* Remove underline */
+    font-weight: bold; /* Make it stand out */
+    transition: color 0.3s ease;
+}
+
+.abstract-link:hover {
+    color: #2A7CB5; /* Darker blue on hover */
+    text-decoration: underline; /* Add underline on hover */
+}

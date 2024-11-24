@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/filter.css">
+		<link rel="stylesheet" href="css/Abstract.css">
+        <link rel="stylesheet" href="css/nouislider.min.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+		
+		
+		<div class="abstract-container">
+        <h2 class="abstract-heading">Info <i class="fas fa-info-circle"></i> </h2>
+        <div id="abstractText" class="abstract-textbox">
+		This GIS Web application provides a comprehensive tool for visualizing and analyzing flood risk for buildings. Developed as a demonstration of the qgis2web plugin, it allows users to interactively explore Geospatial data and filter buildings by their flood risk status. The data used in this application is sourced from
+        <a href="https://www.geoportal.nrw/?activetab=map" target="_blank" class="abstract-link">NRW Geoportal</a>.
+		</div>
+        </div>
+
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/tailDT.js"></script>
+<script src="js/nouislider.min.js"></script>
+<script src="js/wNumb.js"></script>
+        <script src="data/WasseriefeHQ100_1.js"></script>
+        <script src="data/Gebaeude_2.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[50.678964622435004,7.166837773576183],[50.69923131295862,7.201563066726035]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_ESRIGraylight_0');
+        map.getPane('pane_ESRIGraylight_0').style.zIndex = 400;
+        var layer_ESRIGraylight_0 = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            pane: 'pane_ESRIGraylight_0',
+            opacity: 1.0,
+            attribution: '',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_ESRIGraylight_0;
+        map.addLayer(layer_ESRIGraylight_0);
+        function pop_WasseriefeHQ100_1(feature, layer) {
+            var popupContent = '<table>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_WasseriefeHQ100_1_0(feature) {
+            switch(String(feature.properties['DN'])) {
+                case '1':
+                    return {
+                pane: 'pane_WasseriefeHQ100_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(230,240,255,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '2':
+                    return {
+                pane: 'pane_WasseriefeHQ100_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(153,194,255,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '3':
+                    return {
+                pane: 'pane_WasseriefeHQ100_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(77,148,255,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '4':
+                    return {
+                pane: 'pane_WasseriefeHQ100_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,82,204,1.0)',
+                interactive: true,
+            }
+                    break;
+                case '5':
+                    return {
+                pane: 'pane_WasseriefeHQ100_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,41,102,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_WasseriefeHQ100_1');
+        map.getPane('pane_WasseriefeHQ100_1').style.zIndex = 401;
+        map.getPane('pane_WasseriefeHQ100_1').style['mix-blend-mode'] = 'normal';
+        var layer_WasseriefeHQ100_1 = new L.geoJson(json_WasseriefeHQ100_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_WasseriefeHQ100_1',
+            layerName: 'layer_WasseriefeHQ100_1',
+            pane: 'pane_WasseriefeHQ100_1',
+            onEachFeature: pop_WasseriefeHQ100_1,
+            style: style_WasseriefeHQ100_1_0,
+        });
+        bounds_group.addLayer(layer_WasseriefeHQ100_1);
+        map.addLayer(layer_WasseriefeHQ100_1);
+        function pop_Gebaeude_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Max Wasseriefe</th>\
+                        <td class="visible-with-data" id="Max">' + (feature.properties['Max'] !== null ? autolinker.link(feature.properties['Max'].toLocaleString()) + ' m' : '') +  '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Gebäude Zustand</th>\
+                        <td class="visible-with-data" id="Status">' + (feature.properties['Status'] !== null ? autolinker.link(feature.properties['Status'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Gebäude Foto</th>\
+                        <td class="visible-with-data" id="img">' + (feature.properties['img'] !== null ? '<img src="images/' + String(feature.properties['img']).replace(/[\\\/:]/g, '_').trim() + '">' : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Gebaeude_2_0(feature) {
+            switch(String(feature.properties['Status'])) {
+                case 'Gebäude in extremer Hochwassergefahr':
+                    return {
+                pane: 'pane_Gebaeude_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(238,53,42,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Gebäude in Hochwassergefahr':
+                    return {
+                pane: 'pane_Gebaeude_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(215,123,109,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Gebäude in mittlerer Hochwassergefahr':
+                    return {
+                pane: 'pane_Gebaeude_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(230,223,28,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Gebäude in leichter Hochwassergefahr':
+                    return {
+                pane: 'pane_Gebaeude_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(223,220,136,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Gebäude ohne Hochwassergefahr':
+                    return {
+                pane: 'pane_Gebaeude_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(135,219,166,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_Gebaeude_2');
+        map.getPane('pane_Gebaeude_2').style.zIndex = 402;
+        map.getPane('pane_Gebaeude_2').style['mix-blend-mode'] = 'normal';
+        var layer_Gebaeude_2 = new L.geoJson(json_Gebaeude_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Gebaeude_2',
+            layerName: 'layer_Gebaeude_2',
+            pane: 'pane_Gebaeude_2',
+            onEachFeature: pop_Gebaeude_2,
+            style: style_Gebaeude_2_0,
+        });
+        bounds_group.addLayer(layer_Gebaeude_2);
+        map.addLayer(layer_Gebaeude_2);
+        var baseMaps = {};
+        var overlaysTree = [
+            {label: 'Gebaeude<br /><table><tr><td style="text-align: center;"><img src="legend/Gebaeude_2_GebäudeinextremerHochwassergefahr0.png" /></td><td>Gebäude in extremer Hochwassergefahr</td></tr><tr><td style="text-align: center;"><img src="legend/Gebaeude_2_GebäudeinHochwassergefahr1.png" /></td><td>Gebäude in Hochwassergefahr</td></tr><tr><td style="text-align: center;"><img src="legend/Gebaeude_2_GebäudeinmittlererHochwassergefahr2.png" /></td><td>Gebäude in mittlerer Hochwassergefahr</td></tr><tr><td style="text-align: center;"><img src="legend/Gebaeude_2_GebäudeinleichterHochwassergefahr3.png" /></td><td>Gebäude in leichter Hochwassergefahr</td></tr><tr><td style="text-align: center;"><img src="legend/Gebaeude_2_GebäudeohneHochwassergefahr4.png" /></td><td>Gebäude ohne Hochwassergefahr</td></tr></table>', layer: layer_Gebaeude_2},
+            {label: 'Wasseriefe-HQ100<br /><table><tr><td style="text-align: center;"><img src="legend/WasseriefeHQ100_1_002m050m0.png" /></td><td>0.02 m - 0.50 m</td></tr><tr><td style="text-align: center;"><img src="legend/WasseriefeHQ100_1_050m100m1.png" /></td><td>0.50 m - 1.00 m</td></tr><tr><td style="text-align: center;"><img src="legend/WasseriefeHQ100_1_100m300m2.png" /></td><td>1.00 m - 3.00 m</td></tr><tr><td style="text-align: center;"><img src="legend/WasseriefeHQ100_1_300m500m3.png" /></td><td>3.00 m - 5.00 m</td></tr><tr><td style="text-align: center;"><img src="legend/WasseriefeHQ100_1_50m4.png" /></td><td>> 5.0 m</td></tr></table>', layer: layer_WasseriefeHQ100_1},
+            {label: "ESRI Gray (light)", layer: layer_ESRIGraylight_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: false, 
+        });
+        lay.addTo(map);
+		document.addEventListener("DOMContentLoaded", function() {
+            // set new Layers List height which considers toggle icon
+            function newLayersListHeight() {
+                var layerScrollbarElement = document.querySelector('.leaflet-control-layers-scrollbar');
+                if (layerScrollbarElement) {
+                    var layersListElement = document.querySelector('.leaflet-control-layers-list');
+                    var originalHeight = layersListElement.style.height 
+                        || window.getComputedStyle(layersListElement).height;
+                    var newHeight = parseFloat(originalHeight) - 50;
+                    layersListElement.style.height = newHeight + 'px';
+                }
+            }
+            var isLayersListExpanded = true;
+            var controlLayersElement = document.querySelector('.leaflet-control-layers');
+            var toggleLayerControl = document.querySelector('.leaflet-control-layers-toggle');
+            // toggle Collapsed/Expanded and apply new Layers List height
+            toggleLayerControl.addEventListener('click', function() {
+                if (isLayersListExpanded) {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                } else {
+                    controlLayersElement.classList.add('leaflet-control-layers-expanded');
+                }
+                isLayersListExpanded = !isLayersListExpanded;
+                newLayersListHeight()
+            });	
+			// apply new Layers List height if toggle layerstree
+			if (controlLayersElement) {
+				controlLayersElement.addEventListener('click', function(event) {
+					var toggleLayerHeaderPointer = event.target.closest('.leaflet-layerstree-header-pointer span');
+					if (toggleLayerHeaderPointer) {
+						newLayersListHeight();
+					}
+				});
+			}
+            // Collapsed/Expanded at Start to apply new height
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            setTimeout(function() {
+                toggleLayerControl.click();
+            }, 10);
+            // Collapsed touch/small screen
+            var isSmallScreen = window.innerWidth < 650;
+            if (isSmallScreen) {
+                setTimeout(function() {
+                    controlLayersElement.classList.remove('leaflet-control-layers-expanded');
+                    isLayersListExpanded = !isLayersListExpanded;
+                }, 500);
+            }  
+        });       
+        setBounds();
+        var mapDiv = document.getElementById('map');
+        var row = document.createElement('div');
+        row.className="row";
+        row.id="mapRow";
+        row.style.height = "100%";
+        var col1 = document.createElement('div');
+        col1.className="col9";
+        col1.id = "mapWindow";
+        col1.style.height = "100%";
+        col1.style.width = "100%";
+        col1.style.display = "block";
+        mapDiv.parentNode.insertBefore(row, mapDiv);
+        document.getElementById("mapRow").appendChild(col1);
+        col1.appendChild(mapDiv)
+        var Filters = {"WaTiefe": "str","Status": "str"};
+        function filterFunc() {
+          map.eachLayer(function(lyr){
+          if ("options" in lyr && "dataVar" in lyr["options"]){
+            features = this[lyr["options"]["dataVar"]].features.slice(0);
+            try{
+              for (key in Filters){
+                keyS = key.replace(/[^a-zA-Z0-9_]/g, "")
+                if (Filters[key] == "str" || Filters[key] == "bool"){
+                  var selection = [];
+                  var options = document.getElementById("sel_" + keyS).options
+                  for (var i=0; i < options.length; i++) {
+                    if (options[i].selected) selection.push(options[i].value);
+                  }
+                    try{
+                      if (key in features[0].properties){
+                        for (i = features.length - 1;
+                          i >= 0; --i){
+                          if (selection.indexOf(
+                          features[i].properties[key])<0
+                          && selection.length>0) {
+                          features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                  }
+                }
+                if (Filters[key] == "int"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (parseInt(features[i].properties[key])
+                          < sliderVals[0]
+                          || parseInt(features[i].properties[key])
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "real"){
+                  sliderVals =  document.getElementById(
+                    "div_" + keyS).noUiSlider.get();
+                  try{
+                    if (key in features[0].properties){
+                    for (i = features.length - 1; i >= 0; --i){
+                      if (features[i].properties[key]
+                          < sliderVals[0]
+                          || features[i].properties[key]
+                          > sliderVals[1]){
+                            features.splice(i,1);
+                          }
+                        }
+                      }
+                    } catch(err){
+                    }
+                  }
+                if (Filters[key] == "date"
+                  || Filters[key] == "datetime"
+                  || Filters[key] == "time"){
+                  try{
+                    if (key in features[0].properties){
+                      HTMLkey = key.replace(/[&\/\\#,+()$~%.'":*?<>{} ]/g, '');
+                      startdate = document.getElementById("dat_" +
+                        HTMLkey + "_date1").value.replace(" ", "T");
+                      enddate = document.getElementById("dat_" +
+                        HTMLkey + "_date2").value.replace(" ", "T");
+                      for (i = features.length - 1; i >= 0; --i){
+                        if (features[i].properties[key] < startdate
+                          || features[i].properties[key] > enddate){
+                          features.splice(i,1);
+                        }
+                      }
+                    }
+                  } catch(err){
+                  }
+                }
+              }
+            } catch(err){
+            }
+          this[lyr["options"]["layerName"]].clearLayers();
+          this[lyr["options"]["layerName"]].addData(features);
+          }
+          })
+        }
+
+            var div_WaTiefe = document.createElement('div');
+            div_WaTiefe.id = "div_WaTiefe";
+            div_WaTiefe.className= "filterselect";
+			document.body.appendChild(div_WaTiefe);
+
+			var lab_WaTiefe = document.createElement('div');
+            lab_WaTiefe.innerHTML = 'Wassertiefe  <i class="fas fa-ruler-vertical"></i> ';
+            lab_WaTiefe.className = 'filterlabel';
+            div_WaTiefe.appendChild(lab_WaTiefe);
+			
+			
+			
+            sel_WaTiefe = document.createElement('select');
+            sel_WaTiefe.multiple = true;
+            sel_WaTiefe.size = 5;
+            sel_WaTiefe.id = "sel_WaTiefe";
+			
+            var WaTiefe_options_str = '';
+            sel_WaTiefe.onchange = function(){filterFunc()};
+            WaTiefe_options_str  += '<option value="0.02 m- 0.50 m">0.02 m- 0.50 m</option>';
+            WaTiefe_options_str  += '<option value="0.50 m- 1.00 m">0.50 m- 1.00 m</option>';
+            WaTiefe_options_str  += '<option value="1.00 m- 3.00 m">1.00 m- 3.00 m</option>';
+            WaTiefe_options_str  += '<option value="3.00 m - 5.00 m">3.00 m - 5.00 m</option>';
+            WaTiefe_options_str  += '<option value="> 5.00 m">> 5.00 m</option>';
+            sel_WaTiefe.innerHTML = WaTiefe_options_str;
+            div_WaTiefe.appendChild(sel_WaTiefe);
+			
+
+			
+            var reset_WaTiefe = document.createElement('div');
+            reset_WaTiefe.innerHTML = '<i class="fas fa-times-circle"></i> clear filter';
+            reset_WaTiefe.className = 'filterlabel';
+            reset_WaTiefe.onclick = function() {
+                var options = document.getElementById("sel_WaTiefe").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+			
+			
+             div_WaTiefe.appendChild(reset_WaTiefe);
+			
+           
+            var div_Status = document.createElement('div');
+            div_Status.id = "div_Status";
+            div_Status.className= "filterselect1";
+			document.body.appendChild(div_Status);
+			
+	        var lab_Status = document.createElement('div');
+            lab_Status.innerHTML = 'Gebäude Zustand <i class="fas fa-exclamation-triangle"></i> '; 
+            lab_Status.className = 'filterlabel1';
+            div_Status.appendChild(lab_Status);
+			
+            sel_Status = document.createElement('select');
+            sel_Status.multiple = true;
+            sel_Status.size = 5;
+            sel_Status.id = "sel_Status";
+            var Status_options_str = '';
+            sel_Status.onchange = function(){filterFunc()};
+            Status_options_str  += '<option value="Gebäude in extremer Hochwassergefahr">Gebäude in extremer Hochwassergefahr</option>';
+			Status_options_str  += '<option value="Gebäude in Hochwassergefahr">Gebäude in Hochwassergefahr</option>';
+            Status_options_str  += '<option value="Gebäude in leichter Hochwassergefahr">Gebäude in leichter Hochwassergefahr</option>';
+            Status_options_str  += '<option value="Gebäude in mittlerer Hochwassergefahr">Gebäude in mittlerer Hochwassergefahr</option>';
+            Status_options_str  += '<option value="Gebäude ohne Hochwassergefahr">Gebäude ohne Hochwassergefahr</option>';
+            sel_Status.innerHTML = Status_options_str;
+            div_Status.appendChild(sel_Status);
+			
+         
+            var reset_Status = document.createElement('div');
+            reset_Status.innerHTML = '<i class="fas fa-times-circle"></i> clear filter';
+            reset_Status.className = 'filterlabel1';
+            reset_Status.onclick = function() {
+                var options = document.getElementById("sel_Status").options;
+                for (var i=0; i < options.length; i++) {
+                    options[i].selected = false;
+                }
+                filterFunc();
+            };
+            div_Status.appendChild(reset_Status);
+			
+			
+			
+			
+        </script>
+    </body>
+</html>
